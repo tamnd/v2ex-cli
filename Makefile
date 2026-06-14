@@ -6,9 +6,9 @@ VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 COMMIT  := $(shell git rev-parse --short HEAD 2>/dev/null || echo none)
 DATE    := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 LDFLAGS := -s -w \
-	-X github.com/tamnd/v2ex-cli-cli/cli.Version=$(VERSION) \
-	-X github.com/tamnd/v2ex-cli-cli/cli.Commit=$(COMMIT) \
-	-X github.com/tamnd/v2ex-cli-cli/cli.Date=$(DATE)
+	-X github.com/tamnd/v2ex-cli/cli.Version=$(VERSION) \
+	-X github.com/tamnd/v2ex-cli/cli.Commit=$(COMMIT) \
+	-X github.com/tamnd/v2ex-cli/cli.Date=$(DATE)
 
 .PHONY: build install test vet fmt clean run
 

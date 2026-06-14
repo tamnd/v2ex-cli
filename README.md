@@ -2,17 +2,17 @@
 
 Browse V2EX topics, nodes and members
 
-`v2ex` is a single pure-Go binary. It speaks to v2ex-cli over plain
-HTTPS, shapes the responses into clean records, and pipes into the rest of your
-tools. No API key, nothing to run alongside it.
+`v2ex` is a single pure-Go binary. It reads the public V2EX JSON API over
+plain HTTPS, shapes the responses into clean records, and pipes into the rest
+of your tools. No API key, nothing to run alongside it.
 
 ## Install
 
 ```bash
-go install github.com/tamnd/v2ex-cli-cli/cmd/v2ex@latest
+go install github.com/tamnd/v2ex-cli/cmd/v2ex@latest
 ```
 
-Or grab a prebuilt binary from the [releases](https://github.com/tamnd/v2ex-cli-cli/releases), or run
+Or grab a prebuilt binary from the [releases](https://github.com/tamnd/v2ex-cli/releases), or run
 the container image:
 
 ```bash
@@ -22,20 +22,40 @@ docker run --rm ghcr.io/tamnd/v2ex:latest --help
 ## Usage
 
 ```bash
-v2ex --help
-v2ex version
+# hot and latest topic lists
+v2ex hot
+v2ex latest
+v2ex hot -n 10 -o json
+
+# single topic by ID
+v2ex topic 1000
+
+# node by name
+v2ex node go
+
+# member profile
+v2ex member Livid
+
+# replies for a topic
+v2ex replies 1000
 ```
 
-This is a fresh scaffold. The command tree starts with `version`; build out the
-real commands in `cli/` on top of the `v2ex-cli` library package.
+Output defaults to a table on a TTY and JSONL when piped:
+
+```bash
+v2ex hot -o json
+v2ex hot -o csv
+v2ex hot --fields rank,title,url
+```
 
 ## Development
 
 ```
 cmd/v2ex/   thin main, wires cli.Root into fang
-cli/                 the cobra command tree
-v2ex-cli/                the library: HTTP client and data models
-docs/                tago documentation site
+cli/        cobra command tree
+v2ex/       HTTP client and data models
+pkg/render/ output rendering (table/json/jsonl/csv/tsv)
+docs/       tago documentation site
 ```
 
 ```bash
