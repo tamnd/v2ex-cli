@@ -1,0 +1,10 @@
+title       = "v2ex"
+baseURL     = "https://v2ex-cli-cli.tamnd.com/"
+description = "Browse V2EX topics, nodes and members"
+contentDir  = "content"
+outputDir   = "public"
+theme       = "tago-doks"
+syntaxHighlight = "true"
+
+[params]
+github = "https://github.com/tamnd/v2ex-cli-cli"
