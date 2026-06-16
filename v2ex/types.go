@@ -80,6 +80,16 @@ type ReplyRow struct {
 	Content   string `json:"content"`
 }
 
+// NodeRow is the flat record rendered for the all-nodes list.
+type NodeRow struct {
+	Rank   int    `json:"rank"`
+	ID     int    `json:"id"`
+	Name   string `json:"name"`
+	Title  string `json:"title"`
+	Topics int    `json:"topics"`
+	Stars  int    `json:"stars"`
+}
+
 // unixDate converts a Unix timestamp to YYYY-MM-DD.
 func unixDate(ts int64) string {
 	if ts == 0 {

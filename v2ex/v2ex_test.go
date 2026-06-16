@@ -306,6 +306,92 @@ func TestRepliesShow(t *testing.T) {
 	}
 }
 
+// ─── TopicsByNode ─────────────────────────────────────────────────────────────
+
+func TestTopicsByNode(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/topics/show.json" {
+			t.Errorf("unexpected path %q", r.URL.Path)
+		}
+		if r.URL.Query().Get("node_name") != "golang" {
+			t.Errorf("node_name query = %q, want golang", r.URL.Query().Get("node_name"))
+		}
+		_, _ = w.Write([]byte(mockTopicsJSON))
+	}))
+	defer ts.Close()
+
+	c := newTestClient(ts)
+	topics, err := c.TopicsByNode(context.Background(), "golang")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(topics) != 2 {
+		t.Fatalf("got %d topics, want 2", len(topics))
+	}
+	if topics[0].ID != 1001 {
+		t.Errorf("id = %d, want 1001", topics[0].ID)
+	}
+}
+
+func TestTopicsByNodeNotFound(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(mockEmptyTopicJSON))
+	}))
+	defer ts.Close()
+
+	c := newTestClient(ts)
+	_, err := c.TopicsByNode(context.Background(), "doesnotexist")
+	if !errors.Is(err, v2ex.ErrNotFound) {
+		t.Fatalf("got %v, want ErrNotFound", err)
+	}
+}
+
+// ─── AllNodes ─────────────────────────────────────────────────────────────────
+
+const mockAllNodesJSON = `[
+  {"id": 1, "name": "go", "title": "Go Programming", "topics": 1200, "stars": 500},
+  {"id": 2, "name": "python", "title": "Python", "topics": 3000, "stars": 900}
+]`
+
+func TestAllNodes(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/nodes/all.json" {
+			t.Errorf("unexpected path %q", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(mockAllNodesJSON))
+	}))
+	defer ts.Close()
+
+	c := newTestClient(ts)
+	nodes, err := c.AllNodes(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(nodes) != 2 {
+		t.Fatalf("got %d nodes, want 2", len(nodes))
+	}
+	if nodes[0].Name != "go" {
+		t.Errorf("name = %q, want go", nodes[0].Name)
+	}
+	if nodes[1].Topics != 3000 {
+		t.Errorf("topics = %d, want 3000", nodes[1].Topics)
+	}
+}
+
+func TestNodeToRow(t *testing.T) {
+	node := v2ex.Node{ID: 1, Name: "go", Title: "Go Programming", Topics: 1200, Stars: 500}
+	row := v2ex.NodeToRow(node, 1)
+	if row.Rank != 1 {
+		t.Errorf("rank = %d, want 1", row.Rank)
+	}
+	if row.Name != "go" {
+		t.Errorf("name = %q, want go", row.Name)
+	}
+	if row.Topics != 1200 {
+		t.Errorf("topics = %d, want 1200", row.Topics)
+	}
+}
+
 // ─── retry ────────────────────────────────────────────────────────────────────
 
 func TestClientRetries503(t *testing.T) {

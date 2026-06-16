@@ -202,6 +202,29 @@ func (c *Client) Replies(ctx context.Context, topicID string) ([]Reply, error) {
 	return replies, nil
 }
 
+// TopicsByNode fetches the most recent topics for a node by name.
+// Returns ErrNotFound when the API returns an empty array.
+func (c *Client) TopicsByNode(ctx context.Context, nodeName string) ([]Topic, error) {
+	path := "/api/topics/show.json?node_name=" + url.QueryEscape(nodeName)
+	var topics []Topic
+	if err := c.get(ctx, path, &topics); err != nil {
+		return nil, err
+	}
+	if len(topics) == 0 {
+		return nil, ErrNotFound
+	}
+	return topics, nil
+}
+
+// AllNodes fetches the complete list of V2EX nodes.
+func (c *Client) AllNodes(ctx context.Context) ([]Node, error) {
+	var nodes []Node
+	if err := c.get(ctx, "/api/nodes/all.json", &nodes); err != nil {
+		return nil, err
+	}
+	return nodes, nil
+}
+
 // ─── display helpers ──────────────────────────────────────────────────────────
 
 // TopicToRow converts a Topic to a display-friendly TopicRow.
@@ -251,6 +274,18 @@ func MemberToDetails(m Member) []MemberDetail {
 		{Field: "username", Value: m.Username},
 		{Field: "tagline", Value: tagline},
 		{Field: "created", Value: unixDate(m.Created)},
+	}
+}
+
+// NodeToRow converts a Node to the flat NodeRow used in all-nodes lists.
+func NodeToRow(n Node, rank int) NodeRow {
+	return NodeRow{
+		Rank:   rank,
+		ID:     n.ID,
+		Name:   n.Name,
+		Title:  n.Title,
+		Topics: n.Topics,
+		Stars:  n.Stars,
 	}
 }
 
