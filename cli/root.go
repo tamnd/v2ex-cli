@@ -90,9 +90,11 @@ v2ex is an independent tool and is not affiliated with V2EX.`,
 		app.topicsCmd("hot", "Hot topics on V2EX", "/api/topics/hot.json"),
 		app.topicsCmd("latest", "Latest topics on V2EX", "/api/topics/latest.json"),
 		app.topicCmd(),
+		app.nodeTopicsCmd(),
 		app.nodeCmd(),
 		app.memberCmd(),
 		app.repliesCmd(),
+		app.allNodesCmd(),
 		newVersionCmd(),
 	)
 	return root
